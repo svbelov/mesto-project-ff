@@ -23,7 +23,7 @@ const cardAddPopup = document.querySelector('.popup_type_new-card');
 const popups = document.querySelectorAll('.popup');
 
                                                                         // функция создания карточки с установкой соотв. значений вложенных элементов и обработчика клика:
-function createCard(name, link, deleteCardFn) {
+function createCard(name, link, deleteCardFn, likeCardFn) {
     const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
     cardElement.querySelector('.card__title').textContent = name;
     const cardImage = cardElement.querySelector('.card__image');        // запись элемента в переменную во избежание повторного его поиска в DOM для указания значений атрибутов.
@@ -33,12 +33,15 @@ function createCard(name, link, deleteCardFn) {
     const deleteButton = cardElement.querySelector('.card__delete-button');
     deleteButton.addEventListener('click', deleteCardFn);
 
+    const likeButton = cardElement.querySelector('.card__like-button');
+    likeButton.addEventListener('click', likeCardFn);
+
     return cardElement;
 };
 
                                                                         //последовательное добавление в элемент галереи карточек, заполненных из исходного массива:
 initialCards.forEach((card) => {
-    const cardElement = createCard(card.name, card.link, removeCard);
+    const cardElement = createCard(card.name, card.link, removeCard, likeCard);
     placesList.append(cardElement);
 });
 
@@ -47,6 +50,11 @@ function removeCard(evt) {
     const eventTarget = evt.target;
     const card = eventTarget.closest('.card');
     card.remove();
+};
+
+                                                                        //функция лайка для передачи в функцию создания карточки и вызова из обработчика клика:
+function likeCard(evt) {
+    evt.target.classList.toggle('card__like-button_is-active');
 };
 
                                                                         //функция открытия попапа c добавлением обработчика, запускаемого по нажатию клавиши:
@@ -103,18 +111,18 @@ popups.forEach((item) => {
     });
 });
 
-//обработка события submit при отправке формы
+//обработка события submit при отправке формы редактирования профиля
 
-const formElement = profileEditPopup.querySelector('.popup__form');
-const nameInput = formElement.querySelector('.popup__input_type_name');
-const jobInput = formElement.querySelector('.popup__input_type_description');
+const formProfile = profileEditPopup.querySelector('.popup__form');
+const nameInput = formProfile.querySelector('.popup__input_type_name');
+const jobInput = formProfile.querySelector('.popup__input_type_description');
                                                                         //функция обработчик "отправки" формы:
-function handleFormSubmit(evt) {
+function handleProfileFormSubmit(evt) {
     evt.preventDefault();                                               //отмена стандартной отправки формы.
                                                                         //получение значений полей:
     const nameValue = nameInput.value;
     const jobValue = jobInput.value;
-                                                                        //выбор элементов для вставки значений полей:      
+                                                                        //выбор элементов для вставки значений:      
     const nameProfile = document.querySelector('.profile__title');
     const descriptionProfile = document.querySelector('.profile__description');
                                                                         //вставка новых значений:    
@@ -124,6 +132,25 @@ function handleFormSubmit(evt) {
     closePopup(profileEditPopup);
 }
                                                                         //прикрепление обработчика к форме, слушатель события submit:
-formElement.addEventListener('submit', handleFormSubmit);
+formProfile.addEventListener('submit', handleProfileFormSubmit);
 
 
+//обработка события submit при отправке формы добавления карточки
+
+const formCard = cardAddPopup.querySelector('.popup__form');
+const placeName = formCard.querySelector('.popup__input_type_card-name');
+const placeLink = formCard.querySelector('.popup__input_type_url');
+                                                                        //функция обработчик "отправки" формы:
+function handleCardFormSubmit(evt) {
+    evt.preventDefault();                                               //отмена стандартной отправки формы.
+                                                                        //получение значений полей:
+    const nameValue = placeName.value;
+    const linkValue = placeLink.value;
+                                                                        //создание новой карточки путём передачи функции createCard новых значений через аргументы:
+    const cardElement = createCard(nameValue, linkValue, removeCard, likeCard);
+    placesList.prepend(cardElement);                                    //добавление новой карточки в начало, перед остальными карточками.
+    formCard.reset();                                                   //сброс, очистка полей формы.
+    closePopup(cardAddPopup);                                           //закрытие попапа после отправки формы: 
+}
+                                                                        //прикрепление обработчика к форме, слушатель события submit:
+formCard.addEventListener('submit', handleCardFormSubmit);
