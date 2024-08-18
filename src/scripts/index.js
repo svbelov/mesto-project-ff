@@ -23,7 +23,7 @@ const cardAddPopup = document.querySelector('.popup_type_new-card');
 const popups = document.querySelectorAll('.popup');
 
                                                                         // функция создания карточки с установкой соотв. значений вложенных элементов и обработчика клика:
-function createCard(name, link, deleteCardFn, likeCardFn) {
+function createCard(name, link, deleteCardFn, likeCardFn, openImageFn) {
     const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
     cardElement.querySelector('.card__title').textContent = name;
     const cardImage = cardElement.querySelector('.card__image');        // запись элемента в переменную во избежание повторного его поиска в DOM для указания значений атрибутов.
@@ -36,12 +36,14 @@ function createCard(name, link, deleteCardFn, likeCardFn) {
     const likeButton = cardElement.querySelector('.card__like-button');
     likeButton.addEventListener('click', likeCardFn);
 
+    cardImage.addEventListener('click', openImageFn);
+
     return cardElement;
 };
 
                                                                         //последовательное добавление в элемент галереи карточек, заполненных из исходного массива:
 initialCards.forEach((card) => {
-    const cardElement = createCard(card.name, card.link, removeCard, likeCard);
+    const cardElement = createCard(card.name, card.link, removeCard, likeCard, openImagePopup);
     placesList.append(cardElement);
 });
 
@@ -57,9 +59,23 @@ function likeCard(evt) {
     evt.target.classList.toggle('card__like-button_is-active');
 };
 
+
+function openImagePopup(evt) {
+    const cardImagePopup = document.querySelector('.popup_type_image');
+    if (evt.target.classList.contains('card__image')) {
+        const popupImage = document.querySelector('.popup__image');
+        const popupCaption = document.querySelector('.popup__caption');
+        popupImage.src = evt.target.src; 
+        popupImage.alt = evt.target.alt;
+        popupCaption.textContent = evt.target.alt;
+        openPopup(cardImagePopup);
+    }
+};
+
                                                                         //функция открытия попапа c добавлением обработчика, запускаемого по нажатию клавиши:
 function openPopup(popup) {
     popup.classList.add('popup_is-opened');
+    popup.classList.add('popup_is-animated');
     document.addEventListener('keydown', closePopupByPressEsc);
 };
 
@@ -147,7 +163,7 @@ function handleCardFormSubmit(evt) {
     const nameValue = placeName.value;
     const linkValue = placeLink.value;
                                                                         //создание новой карточки путём передачи функции createCard новых значений через аргументы:
-    const cardElement = createCard(nameValue, linkValue, removeCard, likeCard);
+    const cardElement = createCard(nameValue, linkValue, removeCard, likeCard, openImagePopup);
     placesList.prepend(cardElement);                                    //добавление новой карточки в начало, перед остальными карточками.
     formCard.reset();                                                   //сброс, очистка полей формы.
     closePopup(cardAddPopup);                                           //закрытие попапа после отправки формы: 
