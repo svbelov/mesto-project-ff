@@ -3,6 +3,7 @@ import '../pages/index.css';
 import { initialCards } from './cards.js';
 import { createCard, removeCard, likeCard } from './card.js';
 import { openPopup, closePopup, closePopupByPressEsc } from './modal.js';
+import { enableValidation, clearValidation } from './validation.js';
 
 
 // последовательное добавление в элемент галереи карточек, заполненных из исходного массива:
@@ -38,6 +39,8 @@ const profileEditPopup = document.querySelector('.popup_type_edit');
 profileEditButton.addEventListener('click', () => {
     openPopup(profileEditPopup);
     fillEditFormFields();
+
+    clearValidation(formProfile, validationConfig);
 });
 
 
@@ -48,6 +51,9 @@ const cardAddPopup = document.querySelector('.popup_type_new-card');
 
 cardAddButton.addEventListener('click', () => {
     openPopup(cardAddPopup);
+    formCard.reset();
+   
+    clearValidation(formCard, validationConfig);
 })
 
 
@@ -56,7 +62,7 @@ cardAddButton.addEventListener('click', () => {
 const popups = document.querySelectorAll('.popup');
 
 popups.forEach((item) => {
-    item.addEventListener('click', (evt) => {
+    item.addEventListener('mousedown', (evt) => {
         if(evt.target.classList.contains('popup__close') || evt.target.classList.contains('popup')) {
             closePopup(item);
         };
@@ -122,3 +128,30 @@ function handleCardFormSubmit(evt) {
 }
                                                                         //прикрепление обработчика к форме, слушатель события submit:
 formCard.addEventListener('submit', handleCardFormSubmit);
+
+
+//ВАЛИДАЦИЯ ФОРМ *****************************************
+
+// настройки валидации
+
+const validationConfig = {
+    formSelector: '.popup__form',
+    inputSelector: '.popup__input',
+    submitButtonSelector: '.popup__button',
+    inactiveButtonClass: 'popup__button_disabled',
+    inputErrorClass: 'popup__input_type_error',
+    errorClass: 'popup__error_visible'
+  };
+
+
+// включение валидации всех форм
+  
+enableValidation(validationConfig);
+
+
+// очистка ошибок валидации
+
+clearValidation(formProfile, validationConfig); 
+
+//********************************************************
+
