@@ -155,3 +155,21 @@ clearValidation(formProfile, validationConfig);
 
 //********************************************************
 
+//API
+
+fetch('https://mesto.nomoreparties.co/v1/wff-cohort-23/cards', {
+    headers: {
+      authorization: '86aef1fc-61a0-4414-a6ed-93c12d4379af'
+    }
+  })
+    .then(res => res.json())
+    .then((result) => {
+      console.log(result);
+    }); 
+
+fetch('https://nomoreparties.co/v1/wff-cohort-23/users/me', {
+    headers: {
+      authorization: '86aef1fc-61a0-4414-a6ed-93c12d4379af'
+    }
+  })
+
