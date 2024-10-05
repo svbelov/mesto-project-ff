@@ -1,19 +1,21 @@
-
 import '../pages/index.css';
-import { initialCards } from './cards.js';
+// import { initialCards } from './cards.js';
 import { createCard, removeCard, likeCard } from './card.js';
 import { openPopup, closePopup, closePopupByPressEsc } from './modal.js';
 import { enableValidation, clearValidation } from './validation.js';
+import { getUserData, getCards, updateProfile, addNewCard, deleteCard, changeAvatar} from './api.js';
 
 
-// последовательное добавление в элемент галереи карточек, заполненных из исходного массива:
+// последовательное добавление начальных карточек в элемент галереи:
 
 const placesList = document.querySelector('.places__list');             // элемент галереи для последующего вывода в него готовых карточек
 
-initialCards.forEach((card) => {
-    const cardElement = createCard(card.name, card.link, removeCard, likeCard, openImagePopup);
-    placesList.append(cardElement);
-});
+function renderInitialCards(cards, userId) {
+    cards.forEach((data) => {
+        const cardElement = createCard(data, userId, removeCard, likeCard, openImagePopup);
+        placesList.append(cardElement);
+        });
+};
 
 
 // функция заполнения полей формы в попапе редактирования профиля текущими значениями:
@@ -29,6 +31,47 @@ function fillEditFormFields() {
     inputName.value = name;
     inputDescription.value = description;
 }
+
+
+// обработка кликов по аватару профиля
+
+const profileAvatarButton = document.querySelector('.profile__image');
+const profileAvatarPopup = document.querySelector('.popup_type_new-avatar');
+const formAvatar = profileAvatarPopup.querySelector('.popup__form');
+
+profileAvatarButton.addEventListener('click', () => {
+    openPopup(profileAvatarPopup);
+    formAvatar.reset();
+   
+    clearValidation(formAvatar, validationConfig);
+});
+
+
+// обработка события submit при отправке формы изменения аватара
+
+                                                                        //функция обработчик "отправки" формы:
+function handleAvatarFormSubmit(evt) {
+    evt.preventDefault();
+                                                   //отмена стандартной отправки формы.
+    const avatarInput = formAvatar.querySelector('.popup__input_type_url');
+    const avatarLink = avatarInput.value;
+    const submitButton = formAvatar.querySelector('.popup__button');
+    submitButton.textContent = 'Сохранение...'
+                                                                        // обновление данных на сервере и вставка новых значений на страницу:    
+    changeAvatar(avatarLink)
+    .then(() => {
+        avatarProfile.style.backgroundImage = `url(${avatarLink})`;
+        closePopup(profileAvatarPopup);                                 //закрытие попапа после отправки формы:
+    })
+    .catch((err) => {
+        console.log(err);
+    })
+    .finally(() => {
+        submitButton.textContent = 'Сохранить';
+    });
+};
+                                                                        //прикрепление обработчика к форме, слушатель события submit:
+formAvatar.addEventListener('submit', handleAvatarFormSubmit);
 
 
 // обработка кликов по кнопке редактирования профиля:
@@ -57,7 +100,7 @@ cardAddButton.addEventListener('click', () => {
 })
 
 
-//закрытие любого попапа кликом по кнопке или оверлею:
+// закрытие любого попапа кликом по кнопке или оверлею:
 
 const popups = document.querySelectorAll('.popup');
 
@@ -99,9 +142,20 @@ function handleProfileFormSubmit(evt) {
                                                                         //выбор элементов для вставки значений:      
     const nameProfile = document.querySelector('.profile__title');
     const descriptionProfile = document.querySelector('.profile__description');
-                                                                        //вставка новых значений:    
-    nameProfile.textContent = nameValue;
-    descriptionProfile.textContent = jobValue;
+    const submitButton = formProfile.querySelector('.popup__button');
+    submitButton.textContent = 'Сохранение...'
+                                                                        // обновление данных на сервере и вставка новых значений на страницу:    
+    updateProfile(nameValue, jobValue)
+    .then(() => {
+        nameProfile.textContent = nameValue;
+        descriptionProfile.textContent = jobValue;
+    })
+    .catch((err) => {
+        console.log(err);
+    })
+    .finally(() => {
+        submitButton.textContent = 'Сохранить';
+    });
                                                                         //закрытие попапа после отправки формы: 
     closePopup(profileEditPopup);
 }
@@ -117,20 +171,34 @@ const placeLink = formCard.querySelector('.popup__input_type_url');
                                                                         //функция обработчик "отправки" формы:
 function handleCardFormSubmit(evt) {
     evt.preventDefault();                                               //отмена стандартной отправки формы.
+    
+    const submitButton = formProfile.querySelector('.popup__button');
+    submitButton.textContent = 'Сохранение...'
+
                                                                         //получение значений полей:
     const nameValue = placeName.value;
     const linkValue = placeLink.value;
-                                                                        //создание новой карточки путём передачи функции createCard новых значений через параметры:
-    const cardElement = createCard(nameValue, linkValue, removeCard, likeCard, openImagePopup);
-    placesList.prepend(cardElement);                                    //добавление новой карточки в начало, перед остальными карточками.
-    formCard.reset();                                                   //сброс, очистка полей формы.
-    closePopup(cardAddPopup);                                           //закрытие попапа после отправки формы: 
+
+    addNewCard(nameValue, linkValue)
+    .then((data) => {
+        // const cardElement = createCard(nameValue, linkValue, removeCard, likeCard, openImagePopup);
+        console.log(data);                                                  //создание новой карточки путём передачи функции createCard новых значений через параметры:
+        const cardElement = createCard(data, removeCard, likeCard, openImagePopup);
+        placesList.prepend(cardElement);                                    //добавление новой карточки в начало, перед остальными карточками.
+        formCard.reset();                                                   //сброс, очистка полей формы.
+        closePopup(cardAddPopup);                                           //закрытие попапа после отправки формы:        
+    })
+    .catch((err) => {
+        console.log(err);
+    })
+    .finally(() => {
+        submitButton.textContent = 'Сохранить';
+    });
+ 
 }
                                                                         //прикрепление обработчика к форме, слушатель события submit:
 formCard.addEventListener('submit', handleCardFormSubmit);
 
-
-//ВАЛИДАЦИЯ ФОРМ *****************************************
 
 // настройки валидации
 
@@ -142,34 +210,30 @@ const validationConfig = {
     inputErrorClass: 'popup__input_type_error',
     errorClass: 'popup__error_visible'
   };
-
-
-// включение валидации всех форм
   
-enableValidation(validationConfig);
+enableValidation(validationConfig);                                     // включение валидации всех форм
 
+clearValidation(formProfile, validationConfig);                         // очистка ошибок валидации 
 
-// очистка ошибок валидации
-
-clearValidation(formProfile, validationConfig); 
-
-//********************************************************
 
 //API
 
-fetch('https://mesto.nomoreparties.co/v1/wff-cohort-23/cards', {
-    headers: {
-      authorization: '86aef1fc-61a0-4414-a6ed-93c12d4379af'
-    }
-  })
-    .then(res => res.json())
-    .then((result) => {
-      console.log(result);
-    }); 
+const nameProfile = document.querySelector('.profile__title');
+const descriptionProfile = document.querySelector('.profile__description');
+const avatarProfile = document.querySelector('.profile__image');
 
-fetch('https://nomoreparties.co/v1/wff-cohort-23/users/me', {
-    headers: {
-      authorization: '86aef1fc-61a0-4414-a6ed-93c12d4379af'
-    }
-  })
+Promise.all([getUserData(), getCards()])
+    .then(([user, cards]) => {
+        nameProfile.textContent = user.name;
+        descriptionProfile.textContent = user.about;
+        avatarProfile.style.backgroundImage = `url(${user.avatar})`;
+        // let idProfile = user._id;
+        let userId = user._id;
+        console.log(user);
+
+        renderInitialCards(cards, userId);
+    })
+    .catch((err) => {
+        console.log(err);
+    })
 

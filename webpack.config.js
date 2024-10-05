@@ -30,11 +30,6 @@ module.exports = {
         exclude: '/node_modules/'
       },
 
-      // {
-      //   test: /\.(png|svg|jpg|gif|woff(2)?|eot|ttf|otf)$/,      // регулярное выражение, которое ищет все файлы с указанными расширениями
-      //   type: 'asset/resource'
-      // },
-
       {
         test: /\.(png|svg|jpg|jpeg|gif)$/i,                     // регулярное выражение, которое ищет все файлы с указанными расширениями
         type: 'asset/resource',                                 // указание типа файлов, обрабатывать как ресурсы
