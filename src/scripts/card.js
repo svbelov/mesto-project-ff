@@ -9,18 +9,12 @@ export function createCard(data, userId, deleteCardFn, likeCardFn, openImageFn) 
     
     const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
     cardElement.querySelector('.card__title').textContent = data.name;
-    
     const cardImage = cardElement.querySelector('.card__image');
     cardImage.src = data.link;
     cardImage.alt = data.name;
-
-
     const likeCounter = cardElement.querySelector('.card__like-counter');
     likeCounter.textContent = data.likes.length;
-    
-    
     const deleteButton = cardElement.querySelector('.card__delete-button');
-    
 
     if(userId === data.owner._id) {
         deleteButton.classList.add('card__delete-button_visible');
@@ -31,20 +25,18 @@ export function createCard(data, userId, deleteCardFn, likeCardFn, openImageFn) 
         deleteButton.classList.remove('card__delete-button_visible');
     }
 
-
     const likeButton = cardElement.querySelector('.card__like-button');
     
     if (data.likes.some((item) => item._id === userId)) {
         likeButton.classList.add('card__like-button_is-active');
     }
-    // likeButton.addEventListener('click', likeCardFn);
+    
     likeButton.addEventListener('click', () => {
         likeCard(likeButton, data._id, likeCounter);
     });
    
     cardImage.addEventListener('click', openImageFn);
-    
-    
+ 
     return cardElement;
 };
 

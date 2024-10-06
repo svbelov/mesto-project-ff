@@ -1,4 +1,4 @@
-// Настройки валидации
+// настройки валидации
 
 // const validationConfig = {
 //   formSelector: '.popup__form',
@@ -10,7 +10,7 @@
 // };
 
 
-// Функция, которая добавляет класс с ошибкой
+// функция, которая добавляет класс с ошибкой
 
 const showInputError = (formElement, formInput, errorMessage, validationConfig) => {
   const formError = formElement.querySelector(`.${formInput.id}-error`);
@@ -21,7 +21,7 @@ const showInputError = (formElement, formInput, errorMessage, validationConfig) 
 };
 
 
-// Функция, которая удаляет класс с ошибкой
+// функция, которая удаляет класс с ошибкой
 
 const hideInputError = (formElement, formInput, validationConfig) => {
 
@@ -33,7 +33,7 @@ const hideInputError = (formElement, formInput, validationConfig) => {
 };
 
 
-// Функция проверки валидности поля и показа или скрытия ошибки
+// функция проверки валидности поля и показа или скрытия ошибки
 
 const isValid = (formElement, formInput, validationConfig) => {
   if (formInput.validity.patternMismatch) {
@@ -50,7 +50,7 @@ const isValid = (formElement, formInput, validationConfig) => {
 };
 
 
-// Функция, которая добавляет обработчиков всем полям формы
+// функция, которая добавляет обработчиков всем полям формы
 
 const setEventListeners = (formElement, validationConfig) => {
   const inputList = Array.from(formElement.querySelectorAll(validationConfig.inputSelector));
@@ -68,7 +68,7 @@ const setEventListeners = (formElement, validationConfig) => {
 };
 
 
-// Функция включения валидации всех форм
+// функция включения валидации всех форм
 
 export const enableValidation = (validationConfig) => {
   const formList = Array.from(document.querySelectorAll(validationConfig.formSelector));
@@ -79,7 +79,7 @@ export const enableValidation = (validationConfig) => {
 };
 
 
-// Функция проверки наличия невалидного поля
+// функция проверки наличия невалидного поля
 
 const hasInvalidInput = (inputList) => {
   return inputList.some((formInput) => {
@@ -88,7 +88,7 @@ const hasInvalidInput = (inputList) => {
 };
 
 
-// Функция меняет состояние кнопки в зависимости от валидности полей
+// функция меняет состояние кнопки в зависимости от валидности полей
 
 const toggleButtonState = (inputList, buttonElement, validationConfig) => {
   if(hasInvalidInput(inputList)) {
@@ -101,7 +101,7 @@ const toggleButtonState = (inputList, buttonElement, validationConfig) => {
 };
 
 
-// Функция, которая очищает ошибки валидации формы
+// функция, которая очищает ошибки валидации формы
 
 export const clearValidation = (formProfile, validationConfig) => {
 
